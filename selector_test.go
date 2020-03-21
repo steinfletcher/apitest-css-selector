@@ -85,7 +85,6 @@ func TestSelector_NthTextValue(t *testing.T) {
 				Status(http.StatusOK).
 				Assert(selector.NthTextValue(test.n, test.selector, test.expected)).
 				End()
-
 		})
 	}
 }
@@ -117,7 +116,32 @@ func TestSelector_TextValueContains(t *testing.T) {
 				Status(http.StatusOK).
 				Assert(selector.ContainsTextValue(test.selector, test.expected)).
 				End()
+		})
+	}
+}
 
+func TestSelector_ElementExists(t *testing.T) {
+	tests := map[string]struct {
+		selector     string
+		responseBody string
+	}{
+		"element exists": {
+			selector:     `div[data-test-id^="product-"]`,
+			responseBody: `<div data-test-id="product-5">first</div>`,
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			apitest.New().
+				Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					_, _ = w.Write([]byte(test.responseBody))
+					w.WriteHeader(http.StatusOK)
+				})).
+				Get("/").
+				Expect(t).
+				Status(http.StatusOK).
+				Assert(selector.ElementExists(test.selector)).
+				End()
 		})
 	}
 }

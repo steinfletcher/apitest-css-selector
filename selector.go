@@ -11,7 +11,7 @@ import (
 type selectionMatcher func(i int, selection *goquery.Selection) bool
 
 func FirstTextValue(selection string, expectedTextValue string) apitest.Assert {
-	return newSelectionAssert(selection, expectedTextValue, func(i int, selection *goquery.Selection) bool {
+	return newAssertSelection(selection, func(i int, selection *goquery.Selection) bool {
 		if i == 0 {
 			if selection.Text() == expectedTextValue {
 				return true
@@ -22,7 +22,7 @@ func FirstTextValue(selection string, expectedTextValue string) apitest.Assert {
 }
 
 func NthTextValue(n int, selection string, expectedTextValue string) apitest.Assert {
-	return newSelectionAssert(selection, expectedTextValue, func(i int, selection *goquery.Selection) bool {
+	return newAssertSelection(selection, func(i int, selection *goquery.Selection) bool {
 		if i == n {
 			if selection.Text() == expectedTextValue {
 				return true
@@ -33,7 +33,7 @@ func NthTextValue(n int, selection string, expectedTextValue string) apitest.Ass
 }
 
 func ContainsTextValue(selection string, expectedTextValue string) apitest.Assert {
-	return newSelectionAssert(selection, expectedTextValue, func(i int, selection *goquery.Selection) bool {
+	return newAssertSelection(selection, func(i int, selection *goquery.Selection) bool {
 		if selection.Text() == expectedTextValue {
 			return true
 		}
@@ -41,7 +41,13 @@ func ContainsTextValue(selection string, expectedTextValue string) apitest.Asser
 	})
 }
 
-func newSelectionAssert(selection string, expectedTextValue string, matcher selectionMatcher) apitest.Assert {
+func ElementExists(selection string) apitest.Assert {
+	return newAssertSelection(selection, func(i int, selection *goquery.Selection) bool {
+		return true
+	})
+}
+
+func newAssertSelection(selection string, matcher selectionMatcher) apitest.Assert {
 	return func(response *http.Response, request *http.Request) error {
 		doc, err := goquery.NewDocumentFromReader(response.Body)
 		if err != nil {
@@ -56,8 +62,7 @@ func newSelectionAssert(selection string, expectedTextValue string, matcher sele
 		})
 
 		if !found {
-			return fmt.Errorf("result did not contain expected value '%s' for selector '%s'",
-				expectedTextValue, selection)
+			return fmt.Errorf("did not find expected value for selector '%s'", selection)
 		}
 
 		return nil
