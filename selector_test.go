@@ -45,7 +45,6 @@ func TestSelector_FirstTextValue(t *testing.T) {
 				Status(http.StatusOK).
 				Assert(selector.FirstTextValue(test.selector, test.expected)).
 				End()
-
 		})
 	}
 }
