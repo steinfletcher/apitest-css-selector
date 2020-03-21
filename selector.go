@@ -3,6 +3,7 @@ package selector
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/steinfletcher/apitest"
@@ -34,7 +35,7 @@ func NthTextValue(n int, selection string, expectedTextValue string) apitest.Ass
 
 func ContainsTextValue(selection string, expectedTextValue string) apitest.Assert {
 	return newAssertSelection(selection, func(i int, selection *goquery.Selection) bool {
-		if selection.Text() == expectedTextValue {
+		if strings.Contains(selection.Text(), expectedTextValue) {
 			return true
 		}
 		return false

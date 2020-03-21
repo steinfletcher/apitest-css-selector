@@ -99,7 +99,7 @@ func TestSelector_TextValueContains(t *testing.T) {
 			selector: ".myClass",
 			responseBody: `<div>
 				<div class="myClass">first</div>
-				<div class="myClass">second</div>
+				<div class="myClass">something second</div>
 			</div>`,
 			expected: "second",
 		},
