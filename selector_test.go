@@ -36,10 +36,10 @@ func TestSelector_FirstTextValue(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			apitest.New().
-				Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					_, _ = w.Write([]byte(test.responseBody))
 					w.WriteHeader(http.StatusOK)
-				})).
+				}).
 				Get("/").
 				Expect(t).
 				Status(http.StatusOK).
@@ -62,10 +62,10 @@ func TestSelector_FirstTextValue_NoMatch(t *testing.T) {
 
 	apitest.New().
 		Verifier(verifier).
-		Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			_, _ = w.Write([]byte(`<div class="myClass">content</div>`))
 			w.WriteHeader(http.StatusOK)
-		})).
+		}).
 		Get("/").
 		Expect(t).
 		Assert(selector.FirstTextValue(".myClass", "notContent")).
@@ -85,7 +85,7 @@ func TestSelector_NthTextValue(t *testing.T) {
 				<div class="myClass">first</div>
 				<div class="myClass">second</div>
 			</div>`, expected: "first",
-			n: 0,
+			n:                 0,
 		},
 		"last text value": {
 			selector: ".myClass",
@@ -93,16 +93,16 @@ func TestSelector_NthTextValue(t *testing.T) {
 				<div class="myClass">first</div>
 				<div class="myClass">second</div>
 			</div>`, expected: "second",
-			n: 1,
+			n:                 1,
 		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			apitest.New().
-				Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					_, _ = w.Write([]byte(test.responseBody))
 					w.WriteHeader(http.StatusOK)
-				})).
+				}).
 				Get("/").
 				Expect(t).
 				Status(http.StatusOK).
@@ -130,10 +130,10 @@ func TestSelector_TextValueContains(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			apitest.New().
-				Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					_, _ = w.Write([]byte(test.responseBody))
 					w.WriteHeader(http.StatusOK)
-				})).
+				}).
 				Get("/").
 				Expect(t).
 				Status(http.StatusOK).
@@ -156,10 +156,10 @@ func TestSelector_ElementExists(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			apitest.New().
-				Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					_, _ = w.Write([]byte(test.responseBody))
 					w.WriteHeader(http.StatusOK)
-				})).
+				}).
 				Get("/").
 				Expect(t).
 				Status(http.StatusOK).
