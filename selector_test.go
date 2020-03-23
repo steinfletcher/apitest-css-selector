@@ -49,6 +49,29 @@ func TestSelector_FirstTextValue(t *testing.T) {
 	}
 }
 
+func TestSelector_FirstTextValue_NoMatch(t *testing.T) {
+	verifier := &mockVerifier{
+		EqualMock: func(t *testing.T, expected, actual interface{}, msgAndArgs ...interface{}) bool {
+			expectedError := "did not find expected value for selector '.myClass'"
+			if actual.(error).Error() != expectedError {
+				t.Fatalf("actual was unexpected: %v", actual)
+			}
+			return true
+		},
+	}
+
+	apitest.New().
+		Verifier(verifier).
+		Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			_, _ = w.Write([]byte(`<div class="myClass">content</div>`))
+			w.WriteHeader(http.StatusOK)
+		})).
+		Get("/").
+		Expect(t).
+		Assert(selector.FirstTextValue(".myClass", "notContent")).
+		End()
+}
+
 func TestSelector_NthTextValue(t *testing.T) {
 	tests := map[string]struct {
 		selector     string
@@ -144,4 +167,30 @@ func TestSelector_ElementExists(t *testing.T) {
 				End()
 		})
 	}
+}
+
+type mockVerifier struct {
+	EqualInvoked bool
+	EqualMock    func(t *testing.T, expected, actual interface{}, msgAndArgs ...interface{}) bool
+
+	JSONEqInvoked bool
+	JSONEqMock    func(t *testing.T, expected string, actual string, msgAndArgs ...interface{}) bool
+
+	FailInvoked bool
+	FailMock    func(t *testing.T, failureMessage string, msgAndArgs ...interface{}) bool
+}
+
+func (m *mockVerifier) Equal(t *testing.T, expected, actual interface{}, msgAndArgs ...interface{}) bool {
+	m.EqualInvoked = true
+	return m.EqualMock(t, expected, actual, msgAndArgs)
+}
+
+func (m *mockVerifier) JSONEq(t *testing.T, expected string, actual string, msgAndArgs ...interface{}) bool {
+	m.JSONEqInvoked = true
+	return m.JSONEqMock(t, expected, actual, msgAndArgs)
+}
+
+func (m *mockVerifier) Fail(t *testing.T, failureMessage string, msgAndArgs ...interface{}) bool {
+	m.FailInvoked = true
+	return m.FailMock(t, failureMessage, msgAndArgs)
 }
