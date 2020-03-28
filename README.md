@@ -21,7 +21,7 @@ apitest.New().
 
 see also `selector.NthTextValue` and `selector.ContainsTextValue`
 
-`selector.ElementExists`
+`selector.Exists`
 
 ```go
 apitest.New().
@@ -32,6 +32,12 @@ apitest.New().
 	Get("/").
 	Expect(t).
 	Status(http.StatusOK).
-	Assert(selector.ElementExists(`div[data-test-id^="product-"]`)).
+	Assert(selector.Exists(`div[data-test-id^="product-"]`)).
 	End()
+```
+
+`selector.Exists` is a variadic function so multiple selectors can be provided, e.g.
+
+```go
+selector.Exists(".myClass", `div[data-test-id^="product-"]`, "#myId")
 ```
