@@ -8,12 +8,11 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/steinfletcher/apitest"
 )
 
 type selectionMatcher func(i int, selection *goquery.Selection) bool
 
-func FirstTextValue(selection string, expectedTextValue string) apitest.Assert {
+func FirstTextValue(selection string, expectedTextValue string) func(*http.Response, *http.Request) error {
 	return newAssertSelection(selection, func(i int, selection *goquery.Selection) bool {
 		if i == 0 {
 			if selection.Text() == expectedTextValue {
@@ -24,7 +23,7 @@ func FirstTextValue(selection string, expectedTextValue string) apitest.Assert {
 	})
 }
 
-func NthTextValue(n int, selection string, expectedTextValue string) apitest.Assert {
+func NthTextValue(n int, selection string, expectedTextValue string) func(*http.Response, *http.Request) error {
 	return newAssertSelection(selection, func(i int, selection *goquery.Selection) bool {
 		if i == n {
 			if selection.Text() == expectedTextValue {
@@ -35,7 +34,7 @@ func NthTextValue(n int, selection string, expectedTextValue string) apitest.Ass
 	})
 }
 
-func ContainsTextValue(selection string, expectedTextValue string) apitest.Assert {
+func ContainsTextValue(selection string, expectedTextValue string) func(*http.Response, *http.Request) error {
 	return newAssertSelection(selection, func(i int, selection *goquery.Selection) bool {
 		if strings.Contains(selection.Text(), expectedTextValue) {
 			return true
@@ -44,7 +43,7 @@ func ContainsTextValue(selection string, expectedTextValue string) apitest.Asser
 	})
 }
 
-func Selection(selection string, selectionFunc func(*goquery.Selection) error) apitest.Assert {
+func Selection(selection string, selectionFunc func(*goquery.Selection) error) func(*http.Response, *http.Request) error {
 	return func(response *http.Response, request *http.Request) error {
 		doc, err := goquery.NewDocumentFromReader(response.Body)
 		if err != nil {
@@ -54,7 +53,7 @@ func Selection(selection string, selectionFunc func(*goquery.Selection) error) a
 	}
 }
 
-func Exists(selections ...string) apitest.Assert {
+func Exists(selections ...string) func(*http.Response, *http.Request) error {
 	return func(response *http.Response, request *http.Request) error {
 		bodyBytes, err := ioutil.ReadAll(response.Body)
 		if err != nil {
@@ -81,7 +80,7 @@ func Exists(selections ...string) apitest.Assert {
 	}
 }
 
-func newAssertSelection(selection string, matcher selectionMatcher) apitest.Assert {
+func newAssertSelection(selection string, matcher selectionMatcher) func(*http.Response, *http.Request) error {
 	return func(response *http.Response, request *http.Request) error {
 		doc, err := goquery.NewDocumentFromReader(response.Body)
 		if err != nil {
