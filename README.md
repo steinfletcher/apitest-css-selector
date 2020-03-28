@@ -26,7 +26,12 @@ see also `selector.NthTextValue` and `selector.ContainsTextValue`
 ```go
 apitest.New().
 	Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte(`<div data-test-id="product-5">first</div>`))
+		_, _ = w.Write([]byte(
+	`<div>
+		<div class="myClass">text</div>
+		<div id="myId">text</div>
+		<div data-test-id="product-5">text</div>
+    </div>`))
 		w.WriteHeader(http.StatusOK)
 	})).
 	Get("/").
