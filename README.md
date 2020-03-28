@@ -31,7 +31,7 @@ apitest.New().
 		<div class="myClass">text</div>
 		<div id="myId">text</div>
 		<div data-test-id="product-5">text</div>
-    </div>`))
+	</div>`))
 		w.WriteHeader(http.StatusOK)
 	})).
 	Get("/").
