@@ -1,7 +1,9 @@
 package selector
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -42,10 +44,31 @@ func ContainsTextValue(selection string, expectedTextValue string) apitest.Asser
 	})
 }
 
-func ElementExists(selection string) apitest.Assert {
-	return newAssertSelection(selection, func(i int, selection *goquery.Selection) bool {
-		return true
-	})
+func Exists(selections ...string) apitest.Assert {
+	return func(response *http.Response, request *http.Request) error {
+		bodyBytes, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+
+		for _, selection := range selections {
+			doc, err := goquery.NewDocumentFromReader(bytes.NewReader(bodyBytes))
+			if err != nil {
+				return err
+			}
+
+			var found bool
+			doc.Find(selection).Each(func(i int, selection *goquery.Selection) {
+				found = true
+			})
+
+			if !found {
+				return fmt.Errorf("did not find expected value for selector '%s'", selection)
+			}
+		}
+
+		return nil
+	}
 }
 
 func newAssertSelection(selection string, matcher selectionMatcher) apitest.Assert {
