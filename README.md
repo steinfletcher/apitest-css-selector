@@ -47,8 +47,8 @@ selector.Exists(".myClass", `div[data-test-id^="product-"]`, "#myId")
 This exposes `goquery`'s Selection api and offers more flexibility over the previous methods
 
 ```go
-Assert(selector.Selection(test.selector, func(selection *goquery.Selection) error {
-	if test.expectedText != selection.Find(".myClass").Text() {
+Assert(selector.Selection(".outerClass", func(selection *goquery.Selection) error {
+	if test.expectedText != selection.Find(".innerClass").Text() {
 	    return fmt.Errorf("text did not match")
 	}
 	return nil
