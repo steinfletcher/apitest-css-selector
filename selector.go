@@ -44,6 +44,16 @@ func ContainsTextValue(selection string, expectedTextValue string) apitest.Asser
 	})
 }
 
+func Selection(selection string, selectionFunc func(*goquery.Selection) error) apitest.Assert {
+	return func(response *http.Response, request *http.Request) error {
+		doc, err := goquery.NewDocumentFromReader(response.Body)
+		if err != nil {
+			return err
+		}
+		return selectionFunc(doc.Find(selection))
+	}
+}
+
 func Exists(selections ...string) apitest.Assert {
 	return func(response *http.Response, request *http.Request) error {
 		bodyBytes, err := ioutil.ReadAll(response.Body)

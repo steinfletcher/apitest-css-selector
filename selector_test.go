@@ -1,9 +1,11 @@
 package selector_test
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/steinfletcher/apitest"
 
 	selector "github.com/steinfletcher/apitest-css-selector"
@@ -217,6 +219,94 @@ func TestSelector_MultipleExists(t *testing.T) {
 				Expect(t).
 				Status(http.StatusOK).
 				Assert(selector.Exists(test.selector...)).
+				End()
+		})
+	}
+}
+
+func TestSelector_Selection(t *testing.T) {
+	tests := map[string]struct {
+		selector      string
+		selectionFunc func(*goquery.Selection) error
+		responseBody  string
+		expectedText  string
+	}{
+		"with selection": {
+			selector: `div[data-test-id^="product-"]`,
+			responseBody: `<div>
+				<div class="otherClass">something second</div>
+				<div data-test-id="product-5">
+					<div class="myClass">expectedText</div>
+				</div>
+			</div>`,
+			expectedText: "expectedText",
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			apitest.New().
+				HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					_, _ = w.Write([]byte(test.responseBody))
+					w.WriteHeader(http.StatusOK)
+				}).
+				Get("/").
+				Expect(t).
+				Status(http.StatusOK).
+				Assert(selector.Selection(test.selector, func(selection *goquery.Selection) error {
+					if test.expectedText != selection.Find(".myClass").Text() {
+						return fmt.Errorf("text did not match")
+					}
+					return nil
+				})).
+				End()
+		})
+	}
+}
+
+func TestSelector_Selection_NotMatch(t *testing.T) {
+	verifier := &mockVerifier{
+		EqualMock: func(t *testing.T, expected, actual interface{}, msgAndArgs ...interface{}) bool {
+			expectedError := "text did not match"
+			if actual.(error).Error() != expectedError {
+				t.Fatalf("actual was unexpected: %v", actual)
+			}
+			return true
+		},
+	}
+
+	tests := map[string]struct {
+		selector      string
+		selectionFunc func(*goquery.Selection) error
+		responseBody  string
+		expectedText  string
+	}{
+		"with selection": {
+			selector: `div[data-test-id^="product-"]`,
+			responseBody: `<div>
+				<div class="otherClass">something second</div>
+				<div data-test-id="product-5">
+					<div class="myClass">notExpectedText</div>
+				</div>
+			</div>`,
+			expectedText: "expectedText",
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			apitest.New().
+				Verifier(verifier).
+				HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					_, _ = w.Write([]byte(test.responseBody))
+					w.WriteHeader(http.StatusOK)
+				}).
+				Get("/").
+				Expect(t).
+				Assert(selector.Selection(test.selector, func(selection *goquery.Selection) error {
+					if test.expectedText != selection.Find(".myClass").Text() {
+						return fmt.Errorf("text did not match")
+					}
+					return nil
+				})).
 				End()
 		})
 	}
