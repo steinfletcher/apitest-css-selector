@@ -32,14 +32,8 @@ apitest.New().
 	Get("/").
 	Expect(t).
 	Status(http.StatusOK).
-	Assert(selector.Exists(`div[data-test-id^="product-"]`)).
+	Assert(selector.Exists(".myClass", `div[data-test-id^="product-"]`, "#myId")).
 	End()
-```
-
-`selector.Exists` is a variadic function so multiple selectors can be provided, e.g.
-
-```go
-selector.Exists(".myClass", `div[data-test-id^="product-"]`, "#myId")
 ```
 
 ### `selector.Selection`
