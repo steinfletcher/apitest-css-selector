@@ -4,7 +4,7 @@ Assertions for [apitest](https://github.com/steinfletcher/apitest) using css sel
 
 ## Examples
 
-`selector.FirstTextValue`
+### `selector.FirstTextValue`
 
 ```go
 apitest.New().
@@ -21,7 +21,7 @@ apitest.New().
 
 see also `selector.NthTextValue` and `selector.ContainsTextValue`
 
-`selector.Exists`
+### `selector.Exists`
 
 ```go
 apitest.New().
@@ -41,3 +41,17 @@ apitest.New().
 ```go
 selector.Exists(".myClass", `div[data-test-id^="product-"]`, "#myId")
 ```
+
+### `selector.Selection`
+
+This exposes `goquery`'s Selection api and offers more flexibility over the previous methods
+
+```go
+Assert(selector.Selection(test.selector, func(selection *goquery.Selection) error {
+	if test.expectedText != selection.Find(".myClass").Text() {
+	    return fmt.Errorf("text did not match")
+	}
+	return nil
+})).
+```
+
