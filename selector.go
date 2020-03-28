@@ -54,6 +54,14 @@ func Selection(selection string, selectionFunc func(*goquery.Selection) error) f
 }
 
 func Exists(selections ...string) func(*http.Response, *http.Request) error {
+	return expectExists(true, selections...)
+}
+
+func NotExists(selections ...string) func(*http.Response, *http.Request) error {
+	return expectExists(false, selections...)
+}
+
+func expectExists(exists bool, selections ...string) func(*http.Response, *http.Request) error {
 	return func(response *http.Response, request *http.Request) error {
 		bodyBytes, err := ioutil.ReadAll(response.Body)
 		if err != nil {
@@ -71,8 +79,8 @@ func Exists(selections ...string) func(*http.Response, *http.Request) error {
 				found = true
 			})
 
-			if !found {
-				return fmt.Errorf("did not find expected value for selector '%s'", selection)
+			if found != exists {
+				return fmt.Errorf("expected found='%v' for selector '%s'", exists, selection)
 			}
 		}
 

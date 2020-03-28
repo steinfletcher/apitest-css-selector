@@ -145,38 +145,12 @@ func TestSelector_TextValueContains(t *testing.T) {
 	}
 }
 
-func TestSelector_Exists(t *testing.T) {
-	tests := map[string]struct {
-		selector     string
-		responseBody string
-	}{
-		"element exists": {
-			selector:     `div[data-test-id^="product-"]`,
-			responseBody: `<div data-test-id="product-5">first</div>`,
-		},
-	}
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) {
-			apitest.New().
-				HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					_, _ = w.Write([]byte(test.responseBody))
-					w.WriteHeader(http.StatusOK)
-				}).
-				Get("/").
-				Expect(t).
-				Status(http.StatusOK).
-				Assert(selector.Exists(test.selector)).
-				End()
-		})
-	}
-}
-
 func TestSelector_Exists_NoMatch(t *testing.T) {
 	verifier := &mockVerifier{
 		EqualMock: func(t *testing.T, expected, actual interface{}, msgAndArgs ...interface{}) bool {
-			expectedError := "did not find expected value for selector '.myClass'"
+			expectedError := "expected found='true' for selector '.myClass'"
 			if actual.(error).Error() != expectedError {
-				t.Fatalf("actual was unexpected: %v", actual)
+				t.Fatal()
 			}
 			return true
 		},
@@ -194,31 +168,47 @@ func TestSelector_Exists_NoMatch(t *testing.T) {
 		End()
 }
 
-func TestSelector_MultipleExists(t *testing.T) {
+func TestSelector_Exists(t *testing.T) {
 	tests := map[string]struct {
+		exists       bool
 		selector     []string
 		responseBody string
 	}{
-		"element exists": {
+		"exists": {
+			exists:   true,
+			selector: []string{`div[data-test-id^="product-"]`},
+		},
+		"multiple exists": {
+			exists:   true,
 			selector: []string{`div[data-test-id^="product-"]`, `.otherClass`},
-			responseBody: `<div>
-				<div class="myClass">first</div>
-				<div class="otherClass">something second</div>
-				<div data-test-id="product-5">first</div>
-			</div>`,
+		},
+		"not exists": {
+			exists:   false,
+			selector: []string{`div[data-test-id^="product-4"]`},
+		},
+		"multiple not exists": {
+			exists:   false,
+			selector: []string{`div[data-test-id^="product-4"]`, `.notExistClass`},
 		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
+			sel := selector.NotExists(test.selector...)
+			if test.exists {
+				sel = selector.Exists(test.selector...)
+			}
 			apitest.New().
 				HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					_, _ = w.Write([]byte(test.responseBody))
+					_, _ = w.Write([]byte(`<div>
+					<div class="myClass">first</div>
+					<div class="otherClass">something second</div>
+					<div data-test-id="product-5">first</div>
+				</div>`))
 					w.WriteHeader(http.StatusOK)
 				}).
 				Get("/").
 				Expect(t).
-				Status(http.StatusOK).
-				Assert(selector.Exists(test.selector...)).
+				Assert(sel).
 				End()
 		})
 	}
@@ -315,7 +305,7 @@ func TestSelector_Selection_NotMatch(t *testing.T) {
 func TestSelector_MultipleExists_NoMatch(t *testing.T) {
 	verifier := &mockVerifier{
 		EqualMock: func(t *testing.T, expected, actual interface{}, msgAndArgs ...interface{}) bool {
-			expectedError := "did not find expected value for selector '.myClass'"
+			expectedError := "expected found='true' for selector '.myClass'"
 			if actual.(error).Error() != expectedError {
 				t.Fatalf("actual was unexpected: %v", actual)
 			}

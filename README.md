@@ -21,7 +21,7 @@ apitest.New().
 
 see also `selector.NthTextValue` and `selector.ContainsTextValue`
 
-### `selector.Exists`
+### `selector.Exists` `selector.NotExists`
 
 ```go
 apitest.New().
