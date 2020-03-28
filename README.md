@@ -38,6 +38,7 @@ apitest.New().
 	Expect(t).
 	Status(http.StatusOK).
 	Assert(selector.Exists(".myClass", `div[data-test-id^="product-"]`, "#myId")).
+	Assert(selector.NotExists("#notExists")).
 	End()
 ```
 
