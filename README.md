@@ -1,3 +1,5 @@
+![Test](https://github.com/steinfletcher/apitest-css-selector/workflows/Test/badge.svg)
+
 # apitest-css-selector
 
 Assertions for [apitest](https://github.com/steinfletcher/apitest) using css selectors.
