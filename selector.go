@@ -61,6 +61,21 @@ func NotExists(selections ...string) func(*http.Response, *http.Request) error {
 	return expectExists(false, selections...)
 }
 
+func TextExists(text string) func(*http.Response, *http.Request) error {
+	return func(response *http.Response, request *http.Request) error {
+		bodyBytes, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+
+		if !strings.Contains(string(bodyBytes), text) {
+			return fmt.Errorf("document did not contain '%v'", text)
+		}
+
+		return nil
+	}
+}
+
 func expectExists(exists bool, selections ...string) func(*http.Response, *http.Request) error {
 	return func(response *http.Response, request *http.Request) error {
 		bodyBytes, err := ioutil.ReadAll(response.Body)

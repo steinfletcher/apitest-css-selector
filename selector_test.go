@@ -11,6 +11,28 @@ import (
 	selector "github.com/steinfletcher/apitest-css-selector"
 )
 
+func TestTextExists(t *testing.T) {
+	apitest.New().
+		HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			_, _ = w.Write([]byte(`<html>
+			<head>
+				<title>My document</title>
+			</head>
+			<body>
+			<h1>Header</h1>
+			<p>Some text to match on</p>
+			</body>
+			</html>`,
+			))
+			w.WriteHeader(http.StatusOK)
+		}).
+		Get("/").
+		Expect(t).
+		Status(http.StatusOK).
+		Assert(selector.TextExists("Some text to match on")).
+		End()
+}
+
 func TestSelector_FirstTextValue(t *testing.T) {
 	tests := map[string]struct {
 		selector     string

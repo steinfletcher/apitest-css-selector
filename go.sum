@@ -8,6 +8,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/steinfletcher/apitest v1.4.5 h1:BfKcS94yzsXomRV0Ojto999uziGGEz+AHh0iQWxrtu0=
 github.com/steinfletcher/apitest v1.4.5/go.mod h1:yaYc9GDlj4fa0qUUDywqAmrELlNbDrBwd36Zgo5hMZo=
+github.com/steinfletcher/apitest-css-selector v0.1.6 h1:Qx6KH9qhOy50wMGQt+fjS3tB2HgAb1Xe0LC6pplvMeg=
+github.com/steinfletcher/apitest-css-selector v0.1.6/go.mod h1:GE2krFnkv6ENLWUInvVc72V09JT4uaJNi8cwDS6SpNU=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H4=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
