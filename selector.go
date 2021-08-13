@@ -12,6 +12,10 @@ import (
 
 type selectionMatcher func(i int, selection *goquery.Selection) bool
 
+func DataTestID(value string) string {
+	return fmt.Sprintf(`[data-test-id="%s"]`, value)
+}
+
 func FirstTextValue(selection string, expectedTextValue string) func(*http.Response, *http.Request) error {
 	return newAssertSelection(selection, func(i int, selection *goquery.Selection) bool {
 		if i == 0 {

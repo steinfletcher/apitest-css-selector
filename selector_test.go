@@ -33,6 +33,30 @@ func TestTextExists(t *testing.T) {
 		End()
 }
 
+func TestWithDataTestID(t *testing.T) {
+	apitest.New().
+		HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			_, _ = w.Write([]byte(`<html>
+		<head>
+			<title>My document</title>
+		</head>
+		<body>
+		<h1>Header</h1>
+		<div data-test-id="some-test-id">
+			<div>some content</div>
+		</div>
+		</body>
+		</html>`,
+			))
+			w.WriteHeader(http.StatusOK)
+		}).
+		Get("/").
+		Expect(t).
+		Status(http.StatusOK).
+		Assert(selector.ContainsTextValue(selector.DataTestID("some-test-id"), "some content")).
+		End()
+}
+
 func TestSelector_FirstTextValue(t *testing.T) {
 	tests := map[string]struct {
 		selector     string
