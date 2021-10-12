@@ -6,6 +6,57 @@ Assertions for [apitest](https://github.com/steinfletcher/apitest) using css sel
 
 ## Examples
 
+### `selector.TextExists`
+
+```go
+apitest.New().
+	HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`<html>
+		<head>
+			<title>My document</title>
+		</head>
+		<body>
+		<h1>Header</h1>
+		<p>Some text to match on</p>
+		</body>
+		</html>`,
+		))
+		w.WriteHeader(http.StatusOK)
+	}).
+	Get("/").
+	Expect(t).
+	Status(http.StatusOK).
+	Assert(selector.TextExists("Some text to match on")).
+	End()
+```
+
+### `selector.ContainsTextValue`
+
+If you are selecting a data test id, a convenience method is provided to simplify the query.
+
+```go
+apitest.New().
+	HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`<html>
+	<head>
+		<title>My document</title>
+	</head>
+	<body>
+	<div data-test-id="some-test-id">
+		<div>some content</div>
+	</div>
+	</body>
+	</html>`,
+		))
+		w.WriteHeader(http.StatusOK)
+	}).
+	Get("/").
+	Expect(t).
+	Status(http.StatusOK).
+	Assert(selector.ContainsTextValue(selector.DataTestID("some-test-id"), "some content")).
+	End()
+```
+
 ### `selector.FirstTextValue`
 
 ```go
@@ -56,4 +107,3 @@ Assert(selector.Selection(".outerClass", func(selection *goquery.Selection) erro
 	return nil
 })).
 ```
-
